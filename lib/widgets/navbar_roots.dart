@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:medicare/screens/chat.dart';
 import 'package:medicare/screens/home_screen.dart';
 import 'package:medicare/screens/messages_screen.dart';
+import 'package:medicare/screens/nearbyHospitals.dart';
 import 'package:medicare/screens/schedule_screen.dart';
 import 'package:medicare/screens/settings_screen.dart';
 
@@ -13,14 +15,12 @@ class NavbarRoots extends StatefulWidget{
 class _NavbarRootsState extends State<NavbarRoots> {
 
   int _selectedIndex = 0;
-  final _screens =[
-    // Home Screen
+
+  final _screens = [
     HomeScreen(),
-    // Messages Screen
-    MessagesScreen(),
-    // Shedule Screen
+    onlinePeople(),
     ScheduleScreen(),
-    // Settings Screen
+    nearby(), // 👈 Nearby screen added here
     SettingsScreen(),
   ];
 
@@ -41,29 +41,33 @@ class _NavbarRootsState extends State<NavbarRoots> {
             fontSize: 15,
           ),
           currentIndex: _selectedIndex,
-          onTap: (index){
+          onTap: (index) {
             setState(() {
               _selectedIndex = index;
             });
           },
           items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.chat_bubble_text_fill),
-            label: "Messages",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: "Schedule",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: "Settings",
-          ),
-        ],
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_filled),
+              label: "Home",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.chat_bubble_text_fill),
+              label: "Messages",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_month),
+              label: "Schedule",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.location_on),
+              label: "Nearby", // 👈 New Nearby tab
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: "Settings",
+            ),
+          ],
         ),
       ),
     );

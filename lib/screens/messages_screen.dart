@@ -1,203 +1,213 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'dart:async';
+import 'dart:convert';
 
-import 'chat_screen.dart';
 
-class MessagesScreen extends StatelessWidget {
-  List imgs = [
-      "doctors.png",
-      "doctors.png",
-      "doctors.png",
-      "doctors.png",
-      "doctors.png",
-      "doctors.png",
+class chat extends StatefulWidget {
+  final String username;
+  final String userImage;
+  const chat({super.key,  required this.username, required this.userImage});
+
+  @override
+  State<chat> createState() => _chatState();
+}
+
+class _chatState extends State<chat> {
+  final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final List<Map<String, dynamic>> messages = [];
+
+  late StreamController<String> streamController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize StreamController
+    streamController = StreamController<String>();
+
+    // Listen to the "simulated WebSocket"
+    streamController.stream.listen((data) {
+      final decoded = jsonDecode(data);
+      setState(() {
+        messages.add({
+          'text': decoded['text'],
+          'isMe': false,
+          'timestamp': DateTime.now(),
+        });
+      });
+
+      _scrollToBottom();
+    });
+  }
+
+  void sendMessage() {
+    final text = _messageController.text.trim();
+    if (text.isNotEmpty) {
+      setState(() {
+        messages.add({
+          'text': text,
+          'isMe': true,
+          'timestamp': DateTime.now(),
+        });
+        _messageController.clear();
+      });
+
+      _scrollToBottom();
+
+      // Simulate server response after 1 second
+      Future.delayed(const Duration(seconds: 1), () {
+        final reply = {
+          'text': _generateAutoReply(text),
+        };
+        streamController.add(jsonEncode(reply));
+      });
+    }
+  }
+
+  String _generateAutoReply(String input) {
+    final responses = [
+      "Sounds great!",
+      "Tell me more!",
+      "Interesting, go on...",
+      "Haha, really?",
+      "I'm not sure about that.",
+      "Let's talk about that later.",
     ];
+    return responses[DateTime.now().second % responses.length];
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    streamController.close();
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        backgroundColor: Colors.white70,
+        title: Row(
+          children: [
+            CircleAvatar(backgroundImage: AssetImage(widget.userImage)),
+            const SizedBox(width: 10),
+            Text(widget.username),
+          ],
+        ),
+      ),
+      body: Column(
         children: [
-          SizedBox(height: 40),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              "Messages",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(height: 30),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 300,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          hintText: "Search",
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.search,
-                    color: Color(0xFF7165D6),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              "Active Now",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(height: 20),
-          SizedBox(height: 90,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 6,
-            shrinkWrap: true,
-            itemBuilder: (context, index) { 
-              return Container(
-                margin: EdgeInsets.symmetric(horizontal: 12),
-                width: 65,
-                height: 65,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      spreadRadius: 2,
-                      blurRadius: 10,
-                    ),
-                  ],
-                ),
-                child: Stack(
-                  textDirection: TextDirection.rtl,
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(12),
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final msg = messages[index];
+                final isMe = msg['isMe'];
+                final time = DateFormat.jm().format(msg['timestamp']);
+
+                return Column(
+                  crossAxisAlignment:
+                  isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: Container(
-                        height: 65,
-                        width: 65,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: Image.asset(
-                            "images/${imgs[index]}",
-                            fit: BoxFit.cover, 
-                          ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 14),
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.75,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isMe
+                            ? Colors.deepPurpleAccent
+                            : Colors.grey.shade300,
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(12),
+                          topRight: const Radius.circular(12),
+                          bottomLeft:
+                          isMe ? const Radius.circular(12) : Radius.zero,
+                          bottomRight:
+                          isMe ? Radius.zero : const Radius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        msg['text'],
+                        style: TextStyle(
+                          color: isMe ? Colors.white : Colors.black87,
+                          fontSize: 16,
                         ),
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.all(4),
-                      padding: EdgeInsets.all(3),
-                      height: 20,
-                      width: 20,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          shape: BoxShape.circle,
+                    Padding(
+                      padding:
+                      const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+                      child: Text(
+                        time,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
                         ),
                       ),
                     ),
                   ],
-                ),
-              );
-            },
-          ),
-          ),
-          SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              "Recent Chat",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+                );
+              },
             ),
           ),
-          ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: 6,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: ListTile(
-                  onTap: () {
-                    Navigator.push(
-                      context, 
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(),
-                        ));
-                  },
-                  leading: CircleAvatar(
-                    radius: 30,
-                    backgroundImage: AssetImage(
-                      "images/${imgs[index]}",
-                    ),
-                  ),
-                  title: Text(
-                    "Dr. Athukorala",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  subtitle: Text("Hello, Doctor are you available today?",
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black54,
-                  ),
-                  ),
-                  trailing: Text(
-                    "12:30",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black54,
-                    ),
+          _buildInputField(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputField() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.grey.shade400),
+                ),
+                child: TextField(
+                  controller: _messageController,
+                  decoration: const InputDecoration(
+                    hintText: 'Type a message',
+                    border: InputBorder.none,
                   ),
                 ),
-              );
-            },
-          ),
-        ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: sendMessage,
+              icon: const Icon(Icons.send, color: Colors.deepPurple),
+            ),
+          ],
+        ),
       ),
     );
   }

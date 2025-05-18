@@ -1,0 +1,2 @@
+D:/NSBM/lecture materials/3rd year/PUSL3190/Medicare/android/app/.cxx/Debug/436d4e3k/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/NSBM/lecture materials/3rd year/PUSL3190/Medicare/android/app/.cxx/Debug/436d4e3k/armeabi-v7a/CMakeFiles/rebuild_cache.dir

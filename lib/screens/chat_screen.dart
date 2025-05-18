@@ -1,8 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:medicare/widgets/chat_sample.dart';
 
-class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+class ChatScreen extends StatefulWidget {
+  final String doctorName;
+  final String doctorImage;
+  final String chatId;
+
+  const ChatScreen({
+    super.key,
+    required this.doctorName,
+    required this.doctorImage,
+    required this.chatId,
+  });
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _messageController = TextEditingController();
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  void _sendMessage() {
+    final text = _messageController.text.trim();
+    if (text.isNotEmpty) {
+      // TODO: Implement sending message logic here using widget.chatId
+      print('Send message: $text to chatId: ${widget.chatId}');
+      _messageController.clear();
+      setState(() {}); // Refresh UI if needed after sending
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +50,17 @@ class ChatScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 25,
-                  backgroundImage: AssetImage("images/doctors.png"),
+                  backgroundImage: AssetImage(widget.doctorImage),
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 10),
                   child: Text(
-                    "Dr. Athukorala",
+                    widget.doctorName,
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
-                  ),
+                ),
               ],
             ),
           ),
@@ -40,8 +72,8 @@ class ChatScreen extends StatelessWidget {
                 color: Colors.white,
                 size: 26,
               ),
-              ),
-              Padding(
+            ),
+            Padding(
               padding: EdgeInsets.only(top: 8, right: 20),
               child: Icon(
                 Icons.video_call,
@@ -84,7 +116,7 @@ class ChatScreen extends StatelessWidget {
               child: Icon(
                 Icons.add,
                 size: 30,
-              ), 
+              ),
             ),
             Padding(
               padding: EdgeInsets.only(left: 5),
@@ -92,7 +124,7 @@ class ChatScreen extends StatelessWidget {
                 Icons.emoji_emotions_outlined,
                 color: Colors.purple,
                 size: 30,
-              ), 
+              ),
             ),
             Padding(
               padding: EdgeInsets.only(left: 10),
@@ -100,20 +132,25 @@ class ChatScreen extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 width: MediaQuery.of(context).size.width / 1.6,
                 child: TextFormField(
+                  controller: _messageController,
                   decoration: InputDecoration(
-                    hintText: "Type Somthing",
+                    hintText: "Type Something",
                     border: InputBorder.none,
                   ),
+                  onFieldSubmitted: (_) => _sendMessage(),
                 ),
               ),
             ),
             Spacer(),
             Padding(
               padding: EdgeInsets.only(right: 10),
-              child: Icon(
-                Icons.send,
-                size: 30,
-                color: Color(0xFF7165D6),
+              child: GestureDetector(
+                onTap: _sendMessage,
+                child: Icon(
+                  Icons.send,
+                  size: 30,
+                  color: Color(0xFF7165D6),
+                ),
               ),
             ),
           ],

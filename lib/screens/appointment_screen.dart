@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:medicare/screens/booking.dart';
 
 // ignore: must_be_immutable
 class AppointmentScreen extends StatelessWidget{
@@ -323,7 +324,12 @@ class AppointmentScreen extends StatelessWidget{
             ),
             SizedBox(height: 15),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const bookin()),
+                );
+              },
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 padding: EdgeInsets.symmetric(vertical: 15),
@@ -343,6 +349,7 @@ class AppointmentScreen extends StatelessWidget{
                 ),
               ),
             ),
+
           ],
         ),
       ),
