@@ -6,6 +6,9 @@ class ApiConfig {
   static const String booking = '/booking';
   static const String nearby = '/nearby';
   static const String search = '/seachdoc';
+  static const String products = '//products';
+  static const String  product= '/product/:id';
+  static const String addmedicine = '/addmedicine';
 
 
   }

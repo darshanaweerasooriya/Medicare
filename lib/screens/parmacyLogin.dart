@@ -17,36 +17,27 @@ class _PloginState extends State<Plogin> {
 
   bool passToggle = true;
 
-  Future<void> loging() async {
-    final url = Uri.parse('http://10.0.2.2:3000/pharlogin'); // Updated endpoint
+  Future<void> login() async {
+    final url = Uri.parse('http://10.0.2.2:3000/pharlogin');
+
     try {
       final response = await http.post(
         url,
         body: json.encode({
-          'email': usernameController.text, // Lowercase 'email'
-          'password': passwordController.text,
+          'email': usernameController.text.trim(),
+          'password': passwordController.text.trim(),
         }),
         headers: {'Content-Type': 'application/json'},
       );
 
       final responseData = json.decode(response.body);
+
       if (response.statusCode == 200 && responseData['status'] == true) {
-        final token = responseData['token'];
-
-        // Optional: Store token in SharedPreferences
-        // final prefs = await SharedPreferences.getInstance();
-        // await prefs.setString('authToken', token);
-
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Login Successful!"),
-            backgroundColor: Colors.green,
-          ),
+          SnackBar(content: Text("Login Successful!"), backgroundColor: Colors.green),
         );
 
-        // Navigate to another screen if needed
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
-
+        // You can also save user info in memory if needed here
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -56,10 +47,9 @@ class _PloginState extends State<Plogin> {
         );
       }
     } catch (error) {
-      print('Error: $error');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("An error occurred. Try again later."),
+          content: Text("An error occurred. Please try again."),
           backgroundColor: Colors.red,
         ),
       );
@@ -126,7 +116,7 @@ class _PloginState extends State<Plogin> {
                   borderRadius: BorderRadius.circular(10),
                   child: InkWell(
                     onTap: () {
-                      loging(); // Call the login function
+                      login(); // Call the login function
                     },
                     child: Padding(
                       padding:

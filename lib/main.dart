@@ -5,6 +5,7 @@ import 'package:medicare/screens/addmedicine.dart';
 import 'package:medicare/screens/appointment_screen.dart';
 import 'package:medicare/screens/booking.dart';
 import 'package:medicare/screens/docScreen.dart';
+import 'package:medicare/screens/medcine.dart';
 import 'package:medicare/screens/nearbyHospitals.dart';
 import 'package:medicare/screens/parmacySignup.dart';
 import 'package:medicare/screens/pharmacist_chatList.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget{
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: nearby()
+      home: MedicineProductScreen()
     );
   }
 }

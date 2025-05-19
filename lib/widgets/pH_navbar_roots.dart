@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:medicare/screens/addmedicine.dart';
 import 'package:medicare/screens/chat.dart';
 import 'package:medicare/screens/home_screen.dart';
 import 'package:medicare/screens/medcine.dart';
 import 'package:medicare/screens/messages_screen.dart';
 import 'package:medicare/screens/nearbyHospitals.dart';
+import 'package:medicare/screens/phaMedicine.dart';
 import 'package:medicare/screens/schedule_screen.dart';
 import 'package:medicare/screens/settings_screen.dart';
 
@@ -18,12 +20,9 @@ class _NavbarRootsState extends State<NavbarRoots> {
   int _selectedIndex = 0;
 
   final _screens = [
-    HomeScreen(),
-    onlinePeople(),
-    ScheduleScreen(),
-    nearby(),
-    MedicineProductScreen(),
-    SettingsScreen(),
+    // Addmedicine(),
+    PharmacistMedicineScreen(),
+    PharmacistMedicineScreen()
   ];
 
   @override
@@ -50,28 +49,17 @@ class _NavbarRootsState extends State<NavbarRoots> {
           },
           items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_filled),
-              label: "Home",
+              icon: Icon(Icons.health_and_safety),
+              label: "Add Medicine",
             ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.chat_bubble_text_fill),
-              label: "Messages",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month),
-              label: "Schedule",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.location_on),
-              label: "Nearby",
-            ),
+
             BottomNavigationBarItem(
               icon: Icon(Icons.medical_information),
               label: "Medicine",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: "Settings",
+              icon: Icon(Icons.chat),
+              label: "chat",
             ),
           ],
         ),
